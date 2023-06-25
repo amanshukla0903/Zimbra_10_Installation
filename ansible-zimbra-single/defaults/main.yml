@@ -2,4 +2,4 @@
 # defaults file for ansible-zimbra-single
 zimbra_fqdn: mail.local.com
 zimbra_timezone: Asia/Kolkata
-zimbra_admin_password: supp0rt
+zimbra_admin_password: password
