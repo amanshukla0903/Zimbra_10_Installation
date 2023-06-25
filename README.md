@@ -64,4 +64,7 @@ The server must be a fresh minimal installation of CentOS or Ubuntu. The network
 
    Save the file and exit.
 
+4. ```shell
+   ansible-playbook site.yml --tags zimbra10
+   ```
 Now you can use this configuration to automate the installation of Zimbra 10 using Ansible.
