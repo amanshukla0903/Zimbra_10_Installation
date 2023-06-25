@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ZimbraLicense verifier="ZV2">
+  <item name="AccountsLimit" value="10000"/>
+  <item name="ArchivingAccountsLimit" value="10000"/>
+  <item name="AttachmentConversionEnabled" value="true"/>
+  <item name="AttachmentIndexingAccountsLimit" value="20000"/>
+  <item name="BackupEnabled" value="true"/>
+  <item name="CrossMailboxSearchEnabled" value="true"/>
+  <item name="EwsAccountsLimit" value="10000"/>
+  <item name="HierarchicalStorageManagementEnabled" value="true"/>
+  <item name="ISyncAccountsLimit" value="10000"/>
+  <item name="InstallType" value="regular"/>
+  <item name="IssuedOn" value="20211222202747Z"/>
+  <item name="IssuedToEmail" value="john.hurley@syancor.com;anthony.publiski@synacor.com"/>
+  <item name="IssuedToName" value="Zimbra Internal (IUL) - Thomas O'Connor"/>
+  <item name="LicenseId" value="46cc9220-0dc3-4b7e-bd42-b4a8b6af4fed"/>
+  <item name="MAPIConnectorAccountsLimit" value="10000"/>
+  <item name="MobileSyncAccountsLimit" value="10000"/>
+  <item name="MobileSyncEnabled" value="true"/>
+  <item name="ResellerName" value=""/>
+  <item name="SMIMEAccountsLimit" value="10000"/>
+  <item name="TouchClientsAccountsLimit" value="10000"/>
+  <item name="TwoFactorAuthAccountsLimit" value="10000"/>
+  <item name="ValidFrom" value="20211221000000Z"/>
+  <item name="ValidUntil" value="20240101170000Z"/>
+  <item name="VoiceAccountsLimit" value="10000"/>
+  <item name="ZSSAccountsLimit" value="0"/>
+  <item name="ZTalkAccountsLimit" value="10000"/>
+  <item name="ZXAccountsLimit" value="0"/>
+  <item name="ZXDesktopAccountsLimit" value="0"/>
+  <item name="ZXWebAccountsLimit" value="0"/>
+  <signature value="5b222dd104a0846ce386d150df30484476a1fe49b2537e8d0f23b9f499590aa5395e34cab3fa9fa3f5a4cc728b17c005d4a9026f5fb5f83b4a45e67f4e9b497ede54006b1cd518b1e6fed1f89f83bb6081b16613b3bee143838defee084af48508fb719fd506c4b6e2f55ec8c05dc09010fc52e1a06d7522b7196be73791249563523acf01e644df3daf1572e2ec8d62cf1f746f53efe1f00bc7999980fb1a239ff4d82cef226ac1099827cc985e810016d3fec3faa2260461543247ed5b7b3f9dd4caeafa28d93a82a7da8890cd79104ad7902aa6c7d9ef4efdfde3bda5f590ad3bee298793d3e1fddfcee131b4890022a5ac56b1e7c36dd30083187de7e2b1" key="zk1"/>
+</ZimbraLicense>

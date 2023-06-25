@@ -1,0 +1,155 @@
+---
+- name: install utilities and dependencies
+  apt:
+    name:
+      - bash-completion
+      - tmux
+      - telnet
+      - dnsutils
+      - tcpdump
+      - wget
+      - lsof
+      - rsync
+    state: present
+    update_cache: yes
+
+- name: perform update
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: disable systemd-timesyncd
+  block:
+    - service: 
+        name: systemd-timesyncd
+        state: stopped
+        enabled: no
+
+    - command: systemctl mask systemd-timesyncd
+
+- name: install chrony
+  apt:
+    name: chrony
+    state: present
+    update_cache: yes
+
+- name: disable systemd-resolved
+  block:
+    - service:
+        name: systemd-resolved
+        state: stopped
+        enabled: no
+
+    - command: systemctl mask systemd-resolved
+
+    - file:
+        path: /etc/resolv.conf
+        state: absent
+
+    - blockinfile:
+        path: /etc/resolv.conf
+        create: yes
+        block: |
+          search {{ ansible_domain }}
+          nameserver 8.8.8.8
+          nameserver 8.8.4.4
+
+- name: install dnsmasq
+  apt:
+    name: dnsmasq
+    state: present
+    update_cache: yes
+
+- name: configure dnsmasq.conf
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+  notify: restart dnsmasq
+
+- meta: flush_handlers
+
+- name: configure local dns
+  block:
+    - file:
+        path: /etc/resolv.conf
+        state: absent
+
+    - blockinfile:
+        path: /etc/resolv.conf
+        create: yes
+        block: |
+          search {{ ansible_domain }}
+          nameserver 127.0.0.1
+
+- name: download zimbra installer
+  get_url:
+    url: https://files.zimbra.com/downloads/9.0.0_GA/zcs-NETWORK-9.0.0_GA_4178.UBUNTU20_64.20211112031526.tgz 
+    dest: /root
+
+- name: extract zimbra installer
+  unarchive:
+    src: /root/zcs-NETWORK-9.0.0_GA_4178.UBUNTU20_64.20211112031526.tgz
+    dest: /root
+    remote_src: yes
+
+- name: configure answer file
+  template:
+    src: zimbra_answers.txt.j2
+    dest: /tmp/zimbra_answers.txt
+
+- name: copy the License File
+  template:
+    src: zimbra_license.j2
+    dest: /tmp/ZCSLicense.xml
+
+- name: capture random chars 1
+  shell: date | md5sum | cut -c 1-9 
+  register: zimbra_random_chars_1
+
+- name: wait 3 seconds
+  pause:
+    seconds: 3
+
+- name: capture random chars 2
+  shell: date | md5sum | cut -c 1-14
+  register: zimbra_random_chars_2
+
+- name: capture mailboxd memory
+  shell: free -m | awk 'NR==2{printf "%.0f\n", $2*0.25 }'
+  register: zimbra_mailboxd_memory
+
+- name: capture system memory
+  shell: free -h | awk 'NR==2{printf "%.0f\n", $2 }'
+  register: zimbra_system_memory
+
+- name: configure config file
+  template:
+    src: zimbra_config.txt.j2
+    dest: /tmp/zimbra_config.txt
+
+- name: run zimbra installer phase 1
+  shell: ./install.sh -s -l /tmp/ZCSLicense.xml < /tmp/zimbra_answers.txt
+  args:
+    chdir: /root/zcs-NETWORK-9.0.0_GA_4178.UBUNTU20_64.20211112031526/
+
+- name: run zimbra installer phase 2
+  command: /opt/zimbra/libexec/zmsetup.pl -c /tmp/zimbra_config.txt
+
+- name: set trusted ip
+  shell: ./zmprov mcf +zimbraMailTrustedIP 127.0.0.1 +zimbraMailTrustedIP "{{ ansible_default_ipv4.address }}"
+  args:
+    chdir: /opt/zimbra/bin
+  become: yes
+  become_user: zimbra
+  become_flags: -i
+  ignore_errors: yes
+
+- name: restart zimbra services
+  shell: ./zmcontrol restart
+  args:
+    chdir: /opt/zimbra/bin
+  become: yes
+  become_user: zimbra
+  become_flags: -i
+  ignore_errors: yes
+

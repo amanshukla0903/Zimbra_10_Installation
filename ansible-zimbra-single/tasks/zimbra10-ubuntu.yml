@@ -1,0 +1,79 @@
+---
+- name: install utilities and dependencies
+  apt:
+    name:
+      - bash-completion
+      - tmux
+      - telnet
+      - dnsutils
+      - tcpdump
+      - wget
+      - lsof
+      - rsync
+    state: present
+    update_cache: yes
+
+- name: perform update
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: disable systemd-timesyncd
+  block:
+    - service: 
+        name: systemd-timesyncd
+        state: stopped
+        enabled: no
+
+    - command: systemctl mask systemd-timesyncd
+
+- name: install chrony
+  apt:
+    name: chrony
+    state: present
+    update_cache: yes
+
+
+- name: download zimbra installer
+  get_url:
+    url: https://files.zimbra.com/downloads/10.0.0_GA/zcs-NETWORK-10.0.0_GA_4518.UBUNTU20_64.20230301065514.tgz
+    dest: /root
+
+- name: extract zimbra installer
+  unarchive:
+    src: /root/zcs-NETWORK-10.0.0_GA_4518.UBUNTU20_64.20230301065514.tgz
+    dest: /root
+    remote_src: yes
+
+- name: configure answer file
+  template:
+    src: zimbra_answers.txt.j2
+    dest: /tmp/zimbra_answers.txt
+
+- name: copy the License File
+  template:
+    src: zimbra_license.j2
+    dest: /tmp/ZCSLicense.xml
+
+- name: configure config file
+  template:
+    src: zimbra_config.txt.j2
+    dest: /tmp/zimbra_config.txt
+
+- name: run zimbra installer phase 1
+  shell: ./install.sh -s -l /tmp/ZCSLicense.xml < /tmp/zimbra_answers.txt
+  args:
+    chdir: /root/zcs-NETWORK-10.0.0_GA_4518.UBUNTU20_64.20230301065514
+
+- name: run zimbra installer phase 2
+  command: /opt/zimbra/libexec/zmsetup.pl -c /tmp/zimbra_config.txt
+
+- name: restart zimbra services
+  shell: ./zmcontrol restart
+  args:
+    chdir: /opt/zimbra/bin
+  become: yes
+  become_user: zimbra
+  become_flags: -i
+  ignore_errors: yes
+
